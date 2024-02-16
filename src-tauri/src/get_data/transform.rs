@@ -36,7 +36,7 @@ pub struct DripData {
     drip: Option<f32>,
     share_count: f32,
     pub position_value: f32,
-    total_return: f32,
+    pub total_return: f32,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -46,8 +46,8 @@ pub struct PositionSeriesEntry {
     nav: f32,
     dividend: Option<f32>,
     pub position_value: f32,
-    total_return_cash_amount: f32,
-    total_return: f32,
+    total_dividend: f32,
+    pub total_return: f32,
     pub drip: DripData,
     pub drip_at_nav: Option<DripData>
 }
@@ -154,9 +154,9 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
             }
         };
         
-        let total_return_cash_amount = match entry.dividend {
-            Some(dividend) => initial_position_value + dividend,
-            None => initial_position_value,
+        let total_dividend = match entry.dividend {
+            Some(dividend) => dividend,
+            None => 0.,
         };
 
         position_series.push(PositionSeriesEntry { 
@@ -165,8 +165,8 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
             nav: entry.nav, 
             dividend: entry.dividend, 
             position_value: initial_position_value, 
-            total_return_cash_amount,
-            total_return: (total_return_cash_amount / initial_position_value) - 1.,
+            total_dividend,
+            total_return: ((initial_position_value + total_dividend) / initial_position_value) - 1.,
             drip: drip_data,
             drip_at_nav: drip_at_nav_data, 
         });
@@ -246,19 +246,20 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
         };
 
 
-        let total_return_cash_amount = match entry.dividend {
-            Some(dividend) => previous_entry.total_return_cash_amount + dividend,
-            None => previous_entry.total_return_cash_amount,
+        let total_dividend = match entry.dividend {
+            Some(dividend) => previous_entry.total_dividend + dividend,
+            None => previous_entry.total_dividend,
         };
+        let position_value = initial_share_count * entry.close;
 
         previous_entry = PositionSeriesEntry { 
             date: entry.date, 
             close: entry.close, 
             nav: entry.nav, 
             dividend: entry.dividend, 
-            position_value: initial_share_count * entry.close, 
-            total_return_cash_amount,
-            total_return: (total_return_cash_amount / initial_position_value) - 1.,
+            total_dividend,
+            position_value,
+            total_return: ((position_value + total_dividend) / initial_position_value) - 1.,
             drip: drip_data,
             drip_at_nav: drip_at_nav_data, 
         };

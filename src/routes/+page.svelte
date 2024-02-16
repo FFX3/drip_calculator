@@ -1,107 +1,131 @@
 <script lang="ts">
-    import Chart, { type ChartItem } from 'chart.js/auto';
     import 'chartjs-adapter-moment';
-    import { invoke } from '@tauri-apps/api/tauri'
-    import { onMount } from 'svelte'
+    import Chart from '$lib/Chart.svelte';
+    import TickerConfigForm from '$lib/ticker-config-form.svelte';
+    import { buildDataset } from '$lib/get-data'
+    import FetchDataForm from '$lib/fetch-data-form.svelte';
+
+
+    type TickerConfiguaration = {
+        ticker: string,
+        mic: string,
+        dripAtNav: boolean,
+        color: string
+    }
+
+    let configuredTickers: {
+        [key: string]: TickerConfiguaration
+    } = {
+        qqq: {
+            ticker: 'qqq',
+            mic: 'xnas',
+            color: 'magenta',
+            dripAtNav: false,
+        },
+
+        clm: {
+            ticker: 'clm',
+            mic: 'xase',
+            color: 'blue',
+            dripAtNav: true,
+        },
+
+        crf: {
+            ticker: 'crf',
+            mic: 'xase',
+            color: 'red',
+            dripAtNav: true,
+        },
+    }
+
+    let configuredTickersArray: TickerConfiguaration[] 
+    $: configuredTickersArray = Object.values(configuredTickers)
+
+    function configureTicker(config: TickerConfiguaration){
+        configuredTickers[config.ticker] = config
+    }
 
     const today = new Date()
     const onYearAgo = new Date(today)
-    onYearAgo.setFullYear(today.getFullYear() - 4)
-
-    function formatDateToYYYYMMDD(date: Date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Adding 1 to month as it's zero-based
-        const day = String(date.getDate()).padStart(2, '0');
-
-        return `${year}-${month}-${day}`;
-    }
-
+    onYearAgo.setFullYear(today.getFullYear() - 1)
 
     let noDripDatasets: any[] = []
-    let chartNoDrip: any = null
-
     let dripDatasets: any[] = []
-    let chartDrip: any = null
-
     let dripAtNavDatasets: any[] = []
-    let chartAtNavDrip: any = null
+    let chartLoading = false
 
-    onMount(()=>{
-        const noDripCanvas = document.getElementById("no_drip")
-        const dripCanvas = document.getElementById("drip")
-        const dripAtNavCanvas = document.getElementById("drip_at_nav")
+    async function fetchData(configs: TickerConfiguaration[]){
+        chartLoading = true
 
-        invoke('fetch_data', {
-            ticker: "clm",
-            mic: "xase",
-            startDate: formatDateToYYYYMMDD(onYearAgo),
-            endDate: formatDateToYYYYMMDD(today)
-        }).then((_data: any)=>{
-            console.log(_data)
-            const { no_drip, drip, drip_at_nav } = _data
-            {
-                noDripDatasets = [...noDripDatasets, {
-                    label: 'clm'.toUpperCase(),
-                    type: 'line',
-                    data: no_drip,
-                }]
+        noDripDatasets = []
+        dripDatasets = []
+        dripAtNavDatasets = []
 
-                console.log("canvas", noDripCanvas)
-                chartNoDrip = new Chart(noDripCanvas as ChartItem, {
-                    data: { datasets: noDripDatasets },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'timeseries',
-                            },
-                        },
-                        parsing: false
-                    }
-                })
-            }
-            {
-                dripDatasets = [...dripDatasets, {
-                    label: 'clm'.toUpperCase(),
-                    type: 'line',
-                    data: drip,
-                }]
-
-                chartDrip = new Chart(dripCanvas as ChartItem, {
-                    data: { datasets: dripDatasets },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'timeseries',
-                            },
-                        },
-                        parsing: false
-                    }
-                })
-            }
-            {
-                dripAtNavDatasets = [...dripAtNavDatasets, {
-                    label: 'clm'.toUpperCase(),
-                    type: 'line',
-                    data: drip_at_nav,
-                }]
-
-                chartDripAtNav = new Chart(dripAtNavCanvas as ChartItem, {
-                    data: { datasets: dripAtNavDatasets },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'timeseries',
-                            },
-                        },
-                        parsing: false
-                    }
-                })
-            }
+        const promises = configs.map((config)=>{
+            return buildDataset(config.ticker, config.mic, onYearAgo, today, 1000, config.color, config.dripAtNav)
         })
-    })
+        const results = await Promise.all(promises)
+        //@ts-ignore
+        const { drip, dripAtNav, noDrip } = results.reduce((carry, { drip, dripAtNav, noDrip })=>{
+            carry.drip.push(drip)
+            carry.noDrip.push(noDrip)
 
+            if(dripAtNav){
+                carry.dripAtNav.push(dripAtNav)
+            }
+
+            return carry
+        },{
+            drip: [],
+            dripAtNav: [],
+            noDrip: [],
+        })
+
+        chartLoading = false
+        dripDatasets = drip
+        dripAtNavDatasets = dripAtNav
+        noDripDatasets = noDrip
+    }
 </script>
 
-<div style="width: 800px;"><canvas id="no_drip"></canvas></div>
-<div style="width: 800px;"><canvas id="drip"></canvas></div>
-<div style="width: 800px;"><canvas id="drip_at_nav"></canvas></div>
+<div style="width: 700px; display: flex; flex-wrap: wrap;  gap: 40px; padding: 40px;">
+    {#each configuredTickersArray as config }
+        <TickerConfigForm 
+            {...config}
+            addTicker={configureTicker}
+        />
+    {/each}
+
+    <TickerConfigForm 
+        clearOnSubmit={true}
+        submitButtonText='Add'
+        addTicker={configureTicker}
+    />
+</div>
+
+<FetchDataForm 
+    fetchData={fetchData}
+    tickerConfigurations={configuredTickersArray}
+/>
+{#if !chartLoading}
+    {#if 0 != noDripDatasets.length}
+        <Chart 
+            chartId='no_drip'
+            datasets={noDripDatasets}
+        />
+    {/if}
+
+    {#if 0 != dripDatasets.length}
+        <Chart 
+            chartId='drip'
+            bind:datasets={dripDatasets}
+        />
+    {/if}
+
+    {#if 0 != dripAtNavDatasets.length}
+        <Chart 
+            chartId='drip_at_nav'
+            datasets={dripAtNavDatasets}
+        />
+    {/if}
+{/if}
