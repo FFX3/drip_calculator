@@ -1,4 +1,4 @@
-use crate::{ MorningstarSeriesData, DividendData };
+use crate::{ DividendData, MorningstarSeriesData };
 
 #[derive(Debug, Clone, Copy)]
 pub struct AssetSeriesEntry {
@@ -46,10 +46,37 @@ pub struct PositionSeriesEntry {
     nav: f32,
     dividend: Option<f32>,
     pub position_value: f32,
-    total_dividend: f32,
+    total_dividends: f32,
     pub total_return: f32,
     pub drip: DripData,
     pub drip_at_nav: Option<DripData>
+}
+
+impl PositionSeriesEntry {
+    pub fn csv_header() -> String {
+        "date,close,nav,dividend,position value,total dividends,total return,(drip) drip,(drip) share count, (drip) total return,(drip) position value,(DAN) drip,(DAN) share count,(DAN) total return,(DAN) position value\n".to_string()
+    }
+    pub fn to_csv_row(&self) -> String {
+        format!("{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n", 
+            self.date, 
+            self.close, 
+            self.nav, 
+            match self.dividend { None => "".to_string(), Some(amount) => amount.to_string() },
+            self.position_value,
+            self.total_dividends,
+            self.total_return,
+            match self.drip.drip { None => "".to_string(), Some(drip) => drip.to_string() },
+            self.drip.share_count,
+            self.drip.total_return,
+            self.drip.position_value,
+            match self.drip_at_nav { None => "".to_string(), Some(data) => 
+                match data.drip { None => "".to_string(), Some(drip) => drip.to_string() }
+            },
+            match self.drip_at_nav { None => "".to_string(), Some(data) => data.share_count.to_string() },
+            match self.drip_at_nav { None => "".to_string(), Some(data) => data.total_return.to_string() },
+            match self.drip_at_nav { None => "".to_string(), Some(data) => data.position_value.to_string() },
+        )
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -155,17 +182,25 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
         };
         
         let total_dividend = match entry.dividend {
-            Some(dividend) => dividend,
+            Some(dividend) => dividend * initial_share_count,
             None => 0.,
+        };
+
+        let (dividend, total_dividends) = match entry.dividend {
+            Some(dividend) => {
+                let dividend = dividend * initial_share_count;
+                (Some(dividend), dividend)
+            },
+            None => (None, 0.),
         };
 
         position_series.push(PositionSeriesEntry { 
             date: entry.date, 
             close: entry.close, 
             nav: entry.nav, 
-            dividend: entry.dividend, 
+            dividend,
             position_value: initial_position_value, 
-            total_dividend,
+            total_dividends,
             total_return: ((initial_position_value + total_dividend) / initial_position_value) - 1.,
             drip: drip_data,
             drip_at_nav: drip_at_nav_data, 
@@ -246,20 +281,24 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
         };
 
 
-        let total_dividend = match entry.dividend {
-            Some(dividend) => previous_entry.total_dividend + dividend,
-            None => previous_entry.total_dividend,
+        let (dividend, total_dividends) = match entry.dividend {
+            Some(dividend) => {
+                let dividend = dividend * initial_share_count;
+                (Some(dividend), dividend + previous_entry.total_dividends)
+            },
+            None => (None, previous_entry.total_dividends),
         };
+
         let position_value = initial_share_count * entry.close;
 
         previous_entry = PositionSeriesEntry { 
             date: entry.date, 
             close: entry.close, 
             nav: entry.nav, 
-            dividend: entry.dividend, 
-            total_dividend,
+            dividend, 
+            total_dividends,
             position_value,
-            total_return: ((position_value + total_dividend) / initial_position_value) - 1.,
+            total_return: ((position_value + total_dividends) / initial_position_value) - 1.,
             drip: drip_data,
             drip_at_nav: drip_at_nav_data, 
         };

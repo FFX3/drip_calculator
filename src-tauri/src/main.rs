@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::fs;
+
 #[macro_use]
 mod macros;
 
@@ -9,7 +11,7 @@ mod get_data;
 use get_data::{ 
     dividend::DividendData, 
     morningstar::MorningstarSeriesData, 
-    transform::PositionSeries,
+    transform::{PositionSeries, PositionSeriesEntry},
 };
 
 mod error;
@@ -18,6 +20,40 @@ use serde::Serialize;
 
 fn main() {
   tauri::Builder::default()
+    .setup(|app| {
+        let app_config_path = app.path_resolver().app_config_dir().expect("can't access appconfig");
+        if !app_config_path.is_dir() {
+            fs::create_dir(&app_config_path).expect("couldn't create config directory");
+        }
+        let path = app_config_path.join("ticker.conf");
+        let read_result = fs::read_to_string(&path);
+        if read_result.is_err() {
+            println!("creating ticker.conf");
+            fs::write(path, r#"{
+                "qqq": {
+                    "ticker": "qqq",
+                    "mic": "xnas",
+                    "color": "magenta",
+                    "dripAtNav": "false"
+                },
+
+                "clm": {
+                    "ticker": "clm",
+                    "mic": "xase",
+                    "color": "\#33d17a",
+                    "dripAtNav": "true"
+                },
+
+                "crf": {
+                    "ticker": "crf",
+                    "mic": "xase",
+                    "color": "red",
+                    "dripAtNav": "true"
+                }
+            }"#).expect("couldn't create ticker.conf");
+        }
+        std::result::Result::Ok(())
+    })
     .invoke_handler(tauri::generate_handler![
         fetch_data,
     ])
@@ -98,6 +134,14 @@ impl PositionSeries {
             }
         }).collect())
     }
+
+    /*  CSV */
+    fn to_csv(&self) -> String {
+        let lines: Vec<String> = self.data.iter()
+            .map(|entry| -> String {entry.to_csv_row()})
+            .collect();
+        PositionSeriesEntry::csv_header() + &lines.join("")
+    }
 }
 
 #[derive(Serialize)]
@@ -108,6 +152,7 @@ struct FetchDataResponse {
     no_drip_total_return: Vec<ChartPoint>,
     drip_total_return: Vec<ChartPoint>,
     drip_at_nav_total_return: Option<Vec<ChartPoint>>,
+    csv: String,
 }
 
 #[tauri::command]
@@ -132,6 +177,7 @@ async fn fetch_data(ticker: String, mic: String, start_date: String, end_date: S
         no_drip_total_return: series.to_no_drip_total_return_chart_points(),
         drip_total_return: series.to_drip_total_return_chart_points(),
         drip_at_nav_total_return: series.to_drip_at_nav_total_return_chart_points(),
+        csv: series.to_csv(),
     })
 }
 

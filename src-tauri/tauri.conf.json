@@ -12,9 +12,20 @@
   },
   "tauri": {
     "allowlist": {
+      "fs": {
+        "writeFile": true,
+        "readFile": true,
+        "scope": ["$APPCONFIG/*"]
+      },
       "http": {
         "all": true,
         "scope": ["https://www.morningstar.com/*"]
+      },
+      "clipboard": {
+          "writeText": true
+      },
+      "dialog": {
+          "all": true
       }
     },
     "bundle": {

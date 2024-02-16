@@ -56,11 +56,11 @@
 <form class="config-form" on:submit={addTickerConfiguration}>
     <div class="config-form__input-container">
         <label for="ticker">Ticker:</label>
-        <input bind:value={ticker} name="ticker"/>
+        <input required bind:value={ticker} name="ticker"/>
     </div>
     <div class="config-form__input-container">
         <label for="mic">MIC code:</label>
-        <input bind:value={mic} name="mic" />
+        <input required bind:value={mic} name="mic" />
     </div>
     <div class="config-form__input-container">
         <label for="drip_at_nav">Drip at nav:</label>
@@ -69,8 +69,8 @@
     <div class="config-form__input-container">
         <label for="color">Color:</label>
         <div style="width: 70px; padding: 0px;">
-            <input style="width: 100%;" bind:value={color} name="color" />
-            <input bind:value={color} name="color_picker" type="color" />
+            <input required style="width: 100%;" bind:value={color} name="color" />
+            <input required bind:value={color} name="color_picker" type="color" />
         </div>
     </div>
     <input type="submit" value={submitButtonText}>

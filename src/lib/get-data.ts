@@ -1,5 +1,4 @@
 import { invoke } from '@tauri-apps/api/tauri'
-import type { ChartDatasetProperties } from 'chart.js';
 
 function formatDateToYYYYMMDD(date: Date) {
     const year = date.getFullYear();
@@ -20,7 +19,7 @@ export async function buildDataset(ticker: string, mic: string, start: Date, end
     })
     const { 
         //no_drip, drip, drip_at_nav,
-        no_drip_total_return, drip_total_return, drip_at_nav_total_return, 
+        no_drip_total_return, drip_total_return, drip_at_nav_total_return, csv
     } = data
 
     const label = ticker.toUpperCase()
@@ -46,7 +45,9 @@ export async function buildDataset(ticker: string, mic: string, start: Date, end
             data: drip_at_nav_total_return,
             borderColor: color,
             backgroundColor: color,
-        } : null
+        } : null,
+        csv,
+        ticker,
     }
 
 }

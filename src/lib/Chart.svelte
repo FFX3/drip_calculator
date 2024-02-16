@@ -13,7 +13,6 @@
     })
 
     onDestroy(()=>{
-        console.log("destroying")
         chart?.destroy()
     })
 
