@@ -61,7 +61,7 @@
 
 <div class="container">
     <h2>Edit tickers</h2>
-    <div style="width: 700px; display: flex; flex-wrap: wrap;  gap: 40px; padding: 40px; max-height: 600px; overflow-y: scroll;">
+    <div style="display: flex; flex-wrap: wrap;  gap: 40px; padding: 40px; max-height: 600px; overflow-y: scroll;">
         {#each configuredTickersArray as config }
             <div class="container" style="background-color: #535C91;">
                 <h3>{config.ticker.toUpperCase()}</h3>

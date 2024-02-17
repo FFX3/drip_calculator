@@ -26,32 +26,32 @@ fn main() {
         if !app_config_path.is_dir() {
             fs::create_dir(&app_config_path).expect("couldn't create config directory");
         }
-        let path = app_config_path.join("ticker.conf");
+        let path = app_config_path.join("tickers.conf");
+        println!("{:?}", path);
         let read_result = fs::read_to_string(&path);
         if read_result.is_err() {
-            println!("creating ticker.conf");
-            fs::write(path, r#"{
-                "qqq": {
-                    "ticker": "qqq",
-                    "mic": "xnas",
-                    "color": "magenta",
-                    "dripAtNav": "false"
-                },
-
-                "clm": {
-                    "ticker": "clm",
-                    "mic": "xase",
-                    "color": "\#33d17a",
-                    "dripAtNav": "true"
-                },
-
-                "crf": {
-                    "ticker": "crf",
-                    "mic": "xase",
-                    "color": "red",
-                    "dripAtNav": "true"
-                }
-            }"#).expect("couldn't create ticker.conf");
+            println!("creating tickers.conf");
+            fs::write(path, 
+"{\
+    \"qqq\": {\
+        \"ticker\": \"qqq\",\
+        \"mic\": \"xnas\",\
+        \"color\": \"magenta\",\
+        \"dripAtNav\": false\
+    },\
+    \"clm\": {\
+        \"ticker\": \"clm\",\
+        \"mic\": \"xase\",\
+        \"color\": \"#33d17a\",\
+        \"dripAtNav\": true\
+    },\
+    \"crf\": {\
+        \"ticker\": \"crf\",\
+        \"mic\": \"xase\",\
+        \"color\": \"red\",\
+        \"dripAtNav\": true\
+    }\
+}").expect("couldn't create ticker.conf");
         }
         std::result::Result::Ok(())
     })
