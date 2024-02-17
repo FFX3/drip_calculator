@@ -117,6 +117,7 @@
     {#if state == 'chart'}
         {#if 0 != noDripDatasets.length}
             <div class="container">
+                <h2>No drip</h2>
                 <Chart 
                     chartId='no_drip'
                     datasets={noDripDatasets}
@@ -126,6 +127,7 @@
 
         {#if 0 != dripDatasets.length}
             <div class="container">
+                <h2>Drip</h2>
                 <Chart 
                     chartId='drip'
                     bind:datasets={dripDatasets}
@@ -135,6 +137,7 @@
 
         {#if 0 != dripAtNavDatasets.length}
             <div class="container">
+                <h2>Drip at nav</h2>
                 <Chart 
                     chartId='drip_at_nav'
                     datasets={dripAtNavDatasets}
