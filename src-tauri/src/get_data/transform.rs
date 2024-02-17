@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use crate::{ DividendData, MorningstarSeriesData };
 
 #[derive(Debug, Clone, Copy)]
@@ -34,6 +36,7 @@ impl AssetSeries {
 #[derive(Debug, Clone, Copy)]
 pub struct DripData {
     drip: Option<f32>,
+    pub dividend: Option<f32>,
     share_count: f32,
     pub position_value: f32,
     pub total_return: f32,
@@ -44,7 +47,7 @@ pub struct PositionSeriesEntry {
     pub date: chrono::DateTime<chrono::offset::Utc>,
     close: f32,
     nav: f32,
-    dividend: Option<f32>,
+    pub dividend: Option<f32>,
     pub position_value: f32,
     total_dividends: f32,
     pub total_return: f32,
@@ -141,6 +144,7 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
                     let position_value = share_count * entry.close;
 
                     DripData {
+                        dividend: Some(cash_amount),
                         total_return: (position_value / initial_position_value) - 1.,
                         drip: Some(drip),
                         position_value,
@@ -153,6 +157,7 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
                     let position_value = share_count * entry.close;
 
                     Some(DripData {
+                        dividend: Some(cash_amount),
                         total_return: (position_value / initial_position_value) - 1.,
                         position_value: share_count * entry.close,
                         drip: Some(drip),
@@ -166,6 +171,7 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
             None => {
                 let share_count = initial_share_count;
                 let drip = DripData {
+                    dividend: None,
                     total_return: 0.,
                     position_value: share_count * entry.close,
                     drip: None,
@@ -224,6 +230,7 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
                     let position_value = share_count * entry.close;
 
                     DripData {
+                        dividend: Some(cash_amount),
                         total_return: (position_value / initial_position_value) - 1.,
                         position_value,
                         drip: Some(drip),
@@ -238,6 +245,7 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
                     let position_value = share_count * entry.close;
 
                     Some(DripData {
+                        dividend: Some(cash_amount),
                         total_return: (position_value / initial_position_value) - 1.,
                         drip: Some(drip),
                         position_value,
@@ -255,6 +263,7 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
                     let position_value = share_count * entry.close;
 
                     DripData {
+                        dividend: None,
                         total_return: (position_value / initial_position_value) - 1.,
                         drip: None,
                         share_count,
@@ -267,6 +276,7 @@ pub fn build_position_series(asset_series: &AssetSeries, initial_position_value:
                     let position_value = share_count * entry.close;
 
                     Some(DripData {
+                        dividend: None,
                         total_return: (position_value / initial_position_value) - 1.,
                         position_value: share_count * entry.close,
                         drip: None,

@@ -2,6 +2,7 @@
     import 'chartjs-adapter-moment';
     import Chart from '$lib/Chart.svelte';
     import Exporter from '$lib/Exporter.svelte';
+    import Overview from '$lib/Overview.svelte';
     import { readTextFile, BaseDirectory } from '@tauri-apps/api/fs';
     import { buildDataset } from '$lib/get-data'
     import FetchDataForm from '$lib/fetch-data-form.svelte';
@@ -34,6 +35,7 @@
     let dripDatasets: any[] = []
     let dripAtNavDatasets: any[] = []
     let csvs: any[] = []
+    let onlyWithDividends: any
     let loading = false
 
     async function fetchData(configs: TickerConfiguaration[], start: Date, end: Date, initialInvestment: number){
@@ -42,13 +44,14 @@
         noDripDatasets = []
         dripDatasets = []
         dripAtNavDatasets = []
+        onlyWithDividends = {}
 
         const promises = configs.map((config)=>{
             return buildDataset(config.ticker, config.mic, start, end, initialInvestment, config.color, config.dripAtNav)
         })
         const results = await Promise.all(promises)
         //@ts-ignore
-        const { drip, dripAtNav, noDrip, csvs: _csvs } = results.reduce((carry, { drip, dripAtNav, noDrip, csv, ticker })=>{
+        const { drip, dripAtNav, noDrip, csvs: _csvs, onlyWithDividends: _onlyWithDividends } = results.reduce((carry, { drip, dripAtNav, noDrip, csv, ticker, onlyWithDividends })=>{
 
             console.log(ticker, csv)
             carry.drip.push(drip)
@@ -56,6 +59,10 @@
             carry.csvs.push({
                 ticker,
                 csv
+            })
+            carry.onlyWithDividends.push({
+                ticker,
+                data: onlyWithDividends
             })
 
             if(dripAtNav){
@@ -68,6 +75,7 @@
             dripAtNav: [],
             noDrip: [],
             csvs: [],
+            onlyWithDividends: [],
         })
 
         loading = false
@@ -75,18 +83,22 @@
         dripAtNavDatasets = dripAtNav
         noDripDatasets = noDrip
         csvs = _csvs
+        onlyWithDividends = _onlyWithDividends
     }
 </script>
-<div style="margin-bottom: 20px;">
+
+<div style="margin-bottom: 20px;" class="container">
     <a href="/configuration">configuration</a>
 </div>
 
-<FetchDataForm 
-    fetchData={fetchData}
-    tickerConfigurations={configuredTickersArray}
-/>
+<div class="container">
+    <FetchDataForm 
+        fetchData={fetchData}
+        tickerConfigurations={configuredTickersArray}
+    />
+</div>
 
-<div style="display: flex; flex-direction: row; gap: 20px;">
+<div style="display: flex; flex-direction: row; gap: 20px; margin-top: 40px;" class="container">
     <div>
         <label for="chart">Chart:</label>
         <input type="radio" name="chart" value="chart" bind:group={state}>
@@ -101,29 +113,43 @@
     </div>
 </div>
 
-{#if !loading && state == 'chart'}
-    {#if 0 != noDripDatasets.length}
-        <Chart 
-            chartId='no_drip'
-            datasets={noDripDatasets}
-        />
+{#if !loading }
+    {#if state == 'chart'}
+        {#if 0 != noDripDatasets.length}
+            <div class="container">
+                <Chart 
+                    chartId='no_drip'
+                    datasets={noDripDatasets}
+                />
+            </div>
+        {/if}
+
+        {#if 0 != dripDatasets.length}
+            <div class="container">
+                <Chart 
+                    chartId='drip'
+                    bind:datasets={dripDatasets}
+                />
+            </div>
+        {/if}
+
+        {#if 0 != dripAtNavDatasets.length}
+            <div class="container">
+                <Chart 
+                    chartId='drip_at_nav'
+                    datasets={dripAtNavDatasets}
+                />
+            </div>
+        {/if}
     {/if}
 
-    {#if 0 != dripDatasets.length}
-        <Chart 
-            chartId='drip'
-            bind:datasets={dripDatasets}
-        />
+    {#if state == 'export'}
+        <Exporter csvs={csvs} />
     {/if}
 
-    {#if 0 != dripAtNavDatasets.length}
-        <Chart 
-            chartId='drip_at_nav'
-            datasets={dripAtNavDatasets}
+    {#if state == 'ticker_overview'}
+        <Overview 
+            data={onlyWithDividends} 
         />
     {/if}
-{/if}
-
-{#if !loading && state == 'export'}
-    <Exporter csvs={csvs} />
 {/if}

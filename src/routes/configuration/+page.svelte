@@ -42,27 +42,38 @@
 
 </script>
 
-<a href="/">comparision</a>
-
-<div style="width: 700px; display: flex; flex-wrap: wrap;  gap: 40px; padding: 40px;">
-    <TickerConfigForm 
-        clearOnSubmit={true}
-        submitButtonText='Add'
-        addTicker={configureTicker}
-    />
+<div style="margin-bottom: 20px;" class="container">
+    <a href="/">comparision</a>
 </div>
 
-<div style="width: 700px; display: flex; flex-wrap: wrap;  gap: 40px; padding: 40px; max-height: 600px; overflow-y: scroll;">
-    {#each configuredTickersArray as config }
-        <div>
+<div class="container">
+    <h2>Add ticker</h2>
+    <div style="width: 700px; display: flex; flex-wrap: wrap;  gap: 40px;">
+            <div class="container" style="background-color: #535C91;">
             <TickerConfigForm 
-                {...config}
+                clearOnSubmit={true}
+                submitButtonText='Add'
                 addTicker={configureTicker}
             />
-            <button style="margin-top: 14px;" on:click={()=>{
-                deleteTicker(config.ticker)
-            }}>Delete</button>
         </div>
-    {/each}
+    </div>
+</div>
 
+<div class="container">
+    <h2>Edit tickers</h2>
+    <div style="width: 700px; display: flex; flex-wrap: wrap;  gap: 40px; padding: 40px; max-height: 600px; overflow-y: scroll;">
+        {#each configuredTickersArray as config }
+            <div class="container" style="background-color: #535C91;">
+                <h3>{config.ticker.toUpperCase()}</h3>
+                <button style="margin-bottom: 14px;" on:click={()=>{
+                    deleteTicker(config.ticker)
+                }}>Delete</button>
+                <TickerConfigForm 
+                    {...config}
+                    addTicker={configureTicker}
+                />
+            </div>
+        {/each}
+
+    </div>
 </div>

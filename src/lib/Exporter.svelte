@@ -8,22 +8,25 @@
 
 <div style="display: flex; gap: 20px;">
     {#each csvs as csv}
-        <button on:click={async ()=>{
-            await writeText(csv.csv)
-            alert(csv.ticker + " csv copied to clipboard")
-        }}>copy {csv.ticker}</button>
-        <button on:click={async ()=>{
-            const filePath = await save({
-                defaultPath: `~/Documents/${csv.ticker}-data.csv`,
-                filters: [{
-                    name: 'csv',
-                    extensions: ['csv'],
-                }]
-            });
-            if(filePath){
-                await writeTextFile(filePath, csv.csv);
-            }
+        <div class="container">
+            <h3>{csv.ticker.toUpperCase()}</h3>
+            <button on:click={async ()=>{
+                await writeText(csv.csv)
+                alert(csv.ticker + " csv copied to clipboard")
+            }}>copy</button>
+            <button on:click={async ()=>{
+                const filePath = await save({
+                    defaultPath: `~/Documents/${csv.ticker}-data.csv`,
+                    filters: [{
+                        name: 'csv',
+                        extensions: ['csv'],
+                    }]
+                });
+                if(filePath){
+                    await writeTextFile(filePath, csv.csv);
+                }
 
-        }}>export {csv.ticker}</button>
+            }}>export</button>
+        </div>
     {/each}
 </div>

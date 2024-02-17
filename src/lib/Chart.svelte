@@ -6,6 +6,8 @@
     export let chartId: string
     export let datasets: any[]
 
+    Chart.defaults.color = 'white'
+
     let canvas: HTMLElement | null
 
     onMount(()=>{
@@ -24,14 +26,14 @@
             options: {
                 scales: {
                     x: {
-                        type: 'timeseries',
+                        type: 'time',
                     },
                 },
                 parsing: false,
             }
         })
-        })()
-        : null
+    })() : null
+
         
 </script>
 

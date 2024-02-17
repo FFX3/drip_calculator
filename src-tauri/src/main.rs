@@ -8,6 +8,7 @@ mod macros;
 
 mod get_data;
 
+use chrono::Datelike;
 use get_data::{ 
     dividend::DividendData, 
     morningstar::MorningstarSeriesData, 
@@ -68,6 +69,12 @@ struct ChartPoint {
     x: i64,
     y: f32,
 }
+
+type OnlyDividend<'a> = std::iter::Filter<
+    std::slice::Iter<'a, PositionSeriesEntry>, 
+    fn(&'_ &'_ PositionSeriesEntry) -> bool
+>;
+
 impl PositionSeries {
     /*  Position values */
     
@@ -142,6 +149,63 @@ impl PositionSeries {
             .collect();
         PositionSeriesEntry::csv_header() + &lines.join("")
     }
+
+    /* Dividends */
+    pub fn only_with_dividend_iter(&self) -> OnlyDividend {
+        fn has_dividend(&entry: &'_ &PositionSeriesEntry) ->bool {
+            entry.dividend.is_some() 
+        }
+        self.data.iter().filter(has_dividend)
+    }
+
+    pub fn only_with_dividend(&self) -> Vec<PositionSeriesEntry> {
+        self.only_with_dividend_iter().cloned().collect::<Vec<PositionSeriesEntry>>()
+    }
+}
+
+#[derive(Serialize)]
+struct OnlyWithDividendData {
+    date: String,
+    dividend: f32,
+    position_value: f32,
+    total_return: f32,
+}
+
+#[derive(Serialize)]
+struct OnlyWithDividendEntry {
+    no_drip: OnlyWithDividendData,
+    drip: OnlyWithDividendData,
+    drip_at_nav: Option<OnlyWithDividendData>
+}
+
+impl OnlyWithDividendEntry {
+    fn from_position_series_entry(entry: &PositionSeriesEntry) -> Self {
+        OnlyWithDividendEntry { 
+            no_drip: OnlyWithDividendData {
+                date: format!("{}-{}-{}", entry.date.year(), entry.date.month(), entry.date.day()), 
+                dividend: entry.dividend.expect("entry must have dividend"), 
+                position_value: entry.position_value, 
+                total_return: entry.total_return 
+            },
+            drip: OnlyWithDividendData {
+                date: format!("{}-{}-{}", entry.date.year(), entry.date.month(), entry.date.day()), 
+                dividend: entry.drip.dividend.expect("entry must have dividend"), 
+                position_value: entry.drip.position_value, 
+                total_return: entry.drip.total_return 
+            },
+            drip_at_nav: match entry.drip_at_nav {
+                Some(drip_at_nav) => {
+                    Some(OnlyWithDividendData {
+                        date: format!("{}-{}-{}", entry.date.year(), entry.date.month(), entry.date.day()), 
+                        dividend: drip_at_nav.dividend.expect("entry must have dividend"), 
+                        position_value: drip_at_nav.position_value, 
+                        total_return: drip_at_nav.total_return 
+                    })
+                },
+                None => None
+            },
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -153,6 +217,7 @@ struct FetchDataResponse {
     drip_total_return: Vec<ChartPoint>,
     drip_at_nav_total_return: Option<Vec<ChartPoint>>,
     csv: String,
+    only_with_dividends: Vec<OnlyWithDividendEntry>,
 }
 
 #[tauri::command]
@@ -178,6 +243,9 @@ async fn fetch_data(ticker: String, mic: String, start_date: String, end_date: S
         drip_total_return: series.to_drip_total_return_chart_points(),
         drip_at_nav_total_return: series.to_drip_at_nav_total_return_chart_points(),
         csv: series.to_csv(),
+        only_with_dividends: series.only_with_dividend_iter().map(|entry| -> OnlyWithDividendEntry { 
+            OnlyWithDividendEntry::from_position_series_entry(entry)
+        }).collect(),
     })
 }
 
