@@ -6,12 +6,12 @@
 # run
 
 ```
-npm run tauri dev
+npm i && npm run tauri dev
 ```
 
 # build
 
 ```
-npm run tauri build
+npm && npm run tauri build
 ```
 
