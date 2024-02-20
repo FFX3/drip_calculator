@@ -9,6 +9,7 @@
     export let fetchData: (conf: TickerConfiguaration[], start: Date, end: Date, initialInvestment: number)=>void
 
     export let tickerConfigurations: TickerConfiguaration[]
+    export let loading: boolean;
 
 
     let end = (new Date()).toISOString().split('T')[0]
@@ -56,6 +57,6 @@
             </div>
         {/each}
     </div>
-    <input type="submit" value="Get Data">
+    <input disabled={loading} type="submit" value="Get Data">
 </form>
 
