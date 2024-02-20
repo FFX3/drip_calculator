@@ -93,6 +93,7 @@
 
 <div class="container">
     <FetchDataForm 
+        loading={loading}
         fetchData={fetchData}
         tickerConfigurations={configuredTickersArray}
     />
