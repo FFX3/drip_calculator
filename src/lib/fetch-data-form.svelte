@@ -1,14 +1,14 @@
 <script lang="ts">
-    type TickerConfiguaration = {
+    type TickerConfiguration = {
         ticker: string,
         mic: string,
         dripAtNav: boolean,
         color: string
     }
 
-    export let fetchData: (conf: TickerConfiguaration[], start: Date, end: Date, initialInvestment: number)=>void
+    export let fetchData: (conf: TickerConfiguration[], start: Date, end: Date, initialInvestment: number)=>void
 
-    export let tickerConfigurations: TickerConfiguaration[]
+    export let tickerConfigurations: TickerConfiguration[]
     export let loading: boolean;
 
 
@@ -21,11 +21,25 @@
 
     let initialInvestment = 1000
 
-    let tickersToBeFetched: { [key: string]: TickerConfiguaration } = {}
+    let tickersToBeFetched: { [key: string]: boolean } = {}
+    $: defaultTickersToBeFetched = tickerConfigurations.reduce((carry, config)=>{
+        carry[config.ticker] = true
+        return carry
+    }, {} as { [key: string]: boolean })
+        console.log(tickersToBeFetched, tickerConfigurations)
+    $: tickersToBeFetched = { ...defaultTickersToBeFetched, ...tickersToBeFetched }
 
     function handleSubmit(event: SubmitEvent){
         event.preventDefault()
-        fetchData(Object.values(tickersToBeFetched), new Date(Date.parse(start)), new Date(Date.parse(end)), initialInvestment)
+        console.log(tickersToBeFetched, tickerConfigurations)
+        const tickerConfigs: TickerConfiguration[] = Object.keys(tickersToBeFetched).reduce((carry, ticker)=>{
+            const config = tickerConfigurations.find(config=>config.ticker === ticker)
+            if(config && tickersToBeFetched[ticker]) {
+                carry.push(config)
+            }
+            return carry
+        },[] as TickerConfiguration[])
+        fetchData(tickerConfigs, new Date(Date.parse(start)), new Date(Date.parse(end)), initialInvestment)
     }
 
 </script>
@@ -46,14 +60,7 @@
         {#each tickerConfigurations as config}
             <div>
                 <label for={config.ticker}>{config.ticker.toUpperCase()}</label>
-                <input type="checkbox" name={config.ticker} on:change={(event)=>{
-                    //@ts-ignore
-                    if(event.target.checked){
-                        tickersToBeFetched[config.ticker] = config
-                    } else {
-                        delete tickersToBeFetched[config.ticker]
-                    }
-                }}>
+                <input bind:checked={tickersToBeFetched[config.ticker]} type="checkbox" name={config.ticker}>
             </div>
         {/each}
     </div>
