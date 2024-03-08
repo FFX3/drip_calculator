@@ -6,7 +6,9 @@
     import Overview from '$lib/Overview.svelte';
     import { buildDataset } from '$lib/get-data'
     import FetchDataForm from '$lib/fetch-data-form.svelte';
-    import type { TickerConfiguration } from "$lib/ticker-configurations";
+    import type { TickerConfiguration, WatchListConfiguration } from "$lib/ticker-configurations";
+    import WatchListConfigurationForm from "$lib/watch-list-configuration-form.svelte";
+    import CreateOrPickWatchList from "$lib/create-or-pick-watch-list.svelte";
 
     let state: 'chart' | 'export' | 'ticker_overview' = 'chart'
     let chartState: 'no_drip' | 'drip' | 'drip_at_nav' = 'no_drip'
@@ -17,6 +19,8 @@
     let csvs: any[] = []
     let onlyWithDividends: any
     let loading = false
+    let watchList: WatchListConfiguration = {}
+    let watchListName: string
 
     async function fetchData(configs: TickerConfiguration[], start: Date, end: Date, initialInvestment: number){
         loading = true
@@ -65,15 +69,25 @@
     }
 </script>
 
-<div style="margin-bottom: 20px;">
-    <a href="/configuration">configuration</a>
-</div>
-
-<div class="container">
-    <FetchDataForm 
-        loading={loading}
-        fetchData={fetchData}
-    />
+<div class="container" style="display: flex; justify-content: space-between; flex-direction: row; align-items: start;">
+    <div style="display: flex; gap: 10px; flex-direction: column;">
+        <CreateOrPickWatchList
+            bind:watchListName={watchListName}
+            bind:watchList={watchList}
+        />
+        <FetchDataForm 
+            bind:watchListName={watchListName}
+            bind:watchList={watchList}
+            loading={loading}
+            fetchData={fetchData}
+        />
+    </div>
+    <div>
+        <WatchListConfigurationForm
+            watchListName={watchListName} 
+            bind:watchList={watchList} 
+        />
+    </div>
 </div>
 
 <div style="display: flex; flex-direction: row; gap: 20px; margin-top: 40px;" class="container">

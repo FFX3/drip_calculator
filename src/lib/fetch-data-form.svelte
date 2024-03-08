@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getWatchListConfigByName, getWatchListNames, type WatchListConfiguration } from "$lib/ticker-configurations"
+    import { type WatchListConfiguration } from "$lib/ticker-configurations"
     type TickerConfiguration = {
         ticker: string,
         mic: string,
@@ -10,11 +10,10 @@
     export let fetchData: (conf: TickerConfiguration[], start: Date, end: Date, initialInvestment: number)=>void
 
     export let watchList: WatchListConfiguration = {}
-    $: watchList
+    export let watchListName: string;
     export let loading: boolean;
-    let tickerConfigurations: TickerConfiguration[] = [];
-    $: tickerConfigurations
-    let watchListName: string;
+    let tickerConfigurations: TickerConfiguration[] 
+    $: tickerConfigurations = Object.values(watchList);
 
 
     let end = (new Date()).toISOString().split('T')[0]
@@ -51,24 +50,6 @@
 
 
 <form class="config-form" on:submit={handleSubmit}>
-    <div>
-        {#await getWatchListNames() then names}
-            <select
-                bind:value={watchListName}
-                on:change={async () => {
-                    watchList = await getWatchListConfigByName(watchListName)
-                    tickerConfigurations = Object.values(watchList)
-                }}
-            >
-                <option value="" selected disabled hidden>Choose watchlist</option>
-                {#each names as name}
-                    <option value={name}>
-                        {name}
-                    </option>
-                {/each}
-            </select>
-        {/await}
-    </div>
     <div>
         <label for="investment">Initial Investment: </label>
         <input bind:value={initialInvestment} type="number" name="investment">

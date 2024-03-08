@@ -3,6 +3,7 @@
     import TickerConfigForm from '$lib/ticker-config-form.svelte';
     import type { TickerConfiguration, WatchListConfiguration } from '$lib/ticker-configurations';
     import { getWatchListConfigByName, getWatchListNames, deleteTicker, configureTicker, createWatchListConfiguration, deleteWatchListConfiguration  } from '$lib/ticker-configurations';
+    import WatchListConfigurationForm from '$lib/watch-list-configuration-form.svelte';
     
 
     let watchListName: string = 'default'
@@ -80,33 +81,6 @@
 </div>
 
 <div class="container">
-    <h2>Add ticker</h2>
-    <div style="width: 700px; display: flex; flex-wrap: wrap;  gap: 40px;">
-            <div class="container" style="background-color: #535C91;">
-            <TickerConfigForm 
-                clearOnSubmit={true}
-                submitButtonText='Add'
-                addTicker={_configureTicker}
-            />
-        </div>
-    </div>
+    <WatchListConfigurationForm watchListName={watchListName} watchList={watchList} />
 </div>
 
-<div class="container">
-    <h2>Edit tickers</h2>
-    <div style="display: flex; flex-wrap: wrap;  gap: 40px; padding: 40px; max-height: 600px; overflow-y: scroll;">
-        {#each configuredTickersArray as config }
-            <div class="container" style="background-color: #535C91;">
-                <h3>{config.ticker.toUpperCase()}</h3>
-                <button style="margin-bottom: 14px;" on:click={()=>{
-                    _deleteTicker(config.ticker)
-                }}>Delete</button>
-                <TickerConfigForm 
-                    {...config}
-                    addTicker={_configureTicker}
-                />
-            </div>
-        {/each}
-
-    </div>
-</div>
