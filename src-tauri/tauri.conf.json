@@ -7,7 +7,7 @@
     "distDir": "../build"
   },
   "package": {
-    "productName": "drip calculator",
+    "productName": "ActioScanner",
     "version": "0.1.0"
   },
   "tauri": {
@@ -43,7 +43,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "drip.calculator.andre",
+      "identifier": "actio.scanner.andre",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -72,7 +72,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "drip calculator",
+        "title": "ActioScanner",
         "width": 800,
         "additionalBrowserArgs": "--disable-web-security"
       }

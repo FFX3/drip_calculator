@@ -1,4 +1,5 @@
 <script lang="ts">
+    import loadingIndicatorGif from "$lib/assets/loading-indicator.gif"
     import 'chartjs-adapter-moment';
     import Chart from '$lib/Chart.svelte';
     import Exporter from '$lib/Exporter.svelte';
@@ -66,9 +67,7 @@
                 data: onlyWithDividends
             })
 
-            if(dripAtNav){
-                carry.dripAtNav.push(dripAtNav)
-            }
+            carry.dripAtNav.push(dripAtNav ?? drip)
 
             return carry
         },{
@@ -115,7 +114,11 @@
     </div>
 </div>
 
-{#if !loading }
+{#if loading }
+    <div class="container" style="display: flex; justify-content: center; align-items: center;">
+        <img src={loadingIndicatorGif} />
+    </div>
+{:else}
     {#if state == 'chart'}
         <div class="container">
             <div style="display: flex; flex-direction: row;">
