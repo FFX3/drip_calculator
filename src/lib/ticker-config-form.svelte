@@ -1,10 +1,5 @@
 <script lang="ts">
-    type TickerConfiguaration = {
-        ticker: string,
-        mic: string,
-        dripAtNav: boolean,
-        color: string
-    }
+    import type { TickerConfiguaration } from "$lib/ticker-configurations"
 
     export let addTicker: (conf: TickerConfiguaration)=>void
 

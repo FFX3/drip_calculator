@@ -26,11 +26,15 @@ fn main() {
         if !app_config_path.is_dir() {
             fs::create_dir(&app_config_path).expect("couldn't create config directory");
         }
-        let path = app_config_path.join("tickers.conf");
+        let path = app_config_path.join("ticker-confd");
+        if !path.is_dir() {
+            fs::create_dir(&path).expect("couldn't create config directory");
+        }
+        let path = path.join("default");
         println!("{:?}", path);
         let read_result = fs::read_to_string(&path);
         if read_result.is_err() {
-            println!("creating tickers.conf");
+            println!("creating default");
             fs::write(path, 
 "{\
     \"qqq\": {\

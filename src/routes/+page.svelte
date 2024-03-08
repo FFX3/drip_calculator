@@ -4,34 +4,12 @@
     import Chart from '$lib/Chart.svelte';
     import Exporter from '$lib/Exporter.svelte';
     import Overview from '$lib/Overview.svelte';
-    import { readTextFile, BaseDirectory } from '@tauri-apps/api/fs';
     import { buildDataset } from '$lib/get-data'
     import FetchDataForm from '$lib/fetch-data-form.svelte';
-    
-    type TickerConfiguaration = {
-        ticker: string,
-        mic: string,
-        dripAtNav: boolean,
-        color: string
-    }
+    import type { TickerConfiguration } from "$lib/ticker-configurations";
 
     let state: 'chart' | 'export' | 'ticker_overview' = 'chart'
     let chartState: 'no_drip' | 'drip' | 'drip_at_nav' = 'no_drip'
-
-    let configuredTickers: {
-        [key: string]: TickerConfiguaration
-    } = {} 
-
-    readTextFile('tickers.conf', { dir: BaseDirectory.AppConfig }).then(contents=>{
-        if("" == contents){
-            configuredTickers = {}
-        } else {
-            configuredTickers = JSON.parse(contents)
-        }
-    })
-
-    let configuredTickersArray: TickerConfiguaration[] 
-    $: configuredTickersArray = Object.values(configuredTickers)
 
     let noDripDatasets: any[] = []
     let dripDatasets: any[] = []
@@ -40,7 +18,7 @@
     let onlyWithDividends: any
     let loading = false
 
-    async function fetchData(configs: TickerConfiguaration[], start: Date, end: Date, initialInvestment: number){
+    async function fetchData(configs: TickerConfiguration[], start: Date, end: Date, initialInvestment: number){
         loading = true
 
         noDripDatasets = []
@@ -95,7 +73,6 @@
     <FetchDataForm 
         loading={loading}
         fetchData={fetchData}
-        tickerConfigurations={configuredTickersArray}
     />
 </div>
 

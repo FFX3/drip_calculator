@@ -15,7 +15,9 @@
       "fs": {
         "writeFile": true,
         "readFile": true,
-        "scope": ["$APPCONFIG/*"]
+        "readDir": true,
+        "removeFile": true,
+        "scope": ["$APPCONFIG/ticker-confd/*", "$APPCONFIG/ticker-confd"]
       },
       "http": {
         "all": true,
@@ -43,7 +45,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "actio.scanner.andre",
+      "identifier": "actio.scanner",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
