@@ -3,6 +3,7 @@
     import { onDestroy, onMount } from 'svelte'
     import 'chartjs-adapter-moment';
 
+    export let title: string
     export let chartId: string
     export let datasets: any[]
 
@@ -24,6 +25,11 @@
         return new Chart(canvas as ChartItem, {
             data: { datasets: datasets },
             options: {
+                plugins: {
+                    legend: {
+                        position: 'left',
+                    },
+                },
                 scales: {
                     x: {
                         type: 'time',
@@ -37,4 +43,6 @@
         
 </script>
 
-<div style="width: 800px;"><canvas id={chartId}></canvas></div>
+<h2 style="text-align: center;">{ title }</h2>
+
+<div style="width: 100%;"><canvas id={chartId}></canvas></div>

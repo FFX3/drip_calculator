@@ -15,6 +15,7 @@
     }
 
     let state: 'chart' | 'export' | 'ticker_overview' = 'chart'
+    let chartState: 'no_drip' | 'drip' | 'drip_at_nav' = 'no_drip'
 
     let configuredTickers: {
         [key: string]: TickerConfiguaration
@@ -87,7 +88,7 @@
     }
 </script>
 
-<div style="margin-bottom: 20px;" class="container">
+<div style="margin-bottom: 20px;">
     <a href="/configuration">configuration</a>
 </div>
 
@@ -116,35 +117,36 @@
 
 {#if !loading }
     {#if state == 'chart'}
-        {#if 0 != noDripDatasets.length}
-            <div class="container">
-                <h2>No drip</h2>
-                <Chart 
-                    chartId='no_drip'
-                    datasets={noDripDatasets}
-                />
+        <div class="container">
+            <div style="display: flex; flex-direction: row;">
+                <div style={`padding: 10px; border: 1px white solid; ${chartState == 'no_drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'no_drip'}>no DRIP</div>
+                <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip'}>DRIP</div>
+                <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip_at_nav' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip_at_nav'}>DRIP at NAV</div>
             </div>
-        {/if}
-
-        {#if 0 != dripDatasets.length}
-            <div class="container">
-                <h2>Drip</h2>
-                <Chart 
-                    chartId='drip'
-                    bind:datasets={dripDatasets}
-                />
+            <div style="width: 100%;">
+                {#if 'no_drip' == chartState}
+                    <Chart 
+                        title='Total Returns with no DRIP'
+                        chartId='no_drip'
+                        datasets={noDripDatasets}
+                    />
+                {/if}
+                {#if 'drip' == chartState}
+                    <Chart 
+                        title='Total Returns with DRIP at market price'
+                        chartId='drip'
+                        bind:datasets={dripDatasets}
+                    />
+                {/if}
+                {#if 'drip_at_nav' == chartState}
+                    <Chart 
+                        title='Total Returns with DRIP at NAV price'
+                        chartId='drip_at_nav'
+                        datasets={dripAtNavDatasets}
+                    />
+                {/if}
             </div>
-        {/if}
-
-        {#if 0 != dripAtNavDatasets.length}
-            <div class="container">
-                <h2>Drip at nav</h2>
-                <Chart 
-                    chartId='drip_at_nav'
-                    datasets={dripAtNavDatasets}
-                />
-            </div>
-        {/if}
+        </div>
     {/if}
 
     {#if state == 'export'}
