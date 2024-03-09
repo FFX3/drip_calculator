@@ -7,7 +7,7 @@
     "distDir": "../build"
   },
   "package": {
-    "productName": "ActioScanner",
+    "productName": "Actio Screener",
     "version": "0.1.0"
   },
   "tauri": {
@@ -48,7 +48,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "actio.scanner",
+      "identifier": "actio.screener",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -77,9 +77,8 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "ActioScanner",
-        "width": 800,
-        "additionalBrowserArgs": "--disable-web-security"
+        "title": "Actio Screener",
+        "width": 800
       }
     ]
   }

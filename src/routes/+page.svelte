@@ -1,5 +1,6 @@
 <script lang="ts">
     import loadingIndicatorGif from "$lib/assets/loading-indicator.gif"
+    import logo from "$lib/assets/logo_transparent.png"
     import 'chartjs-adapter-moment';
     import Chart from '$lib/Chart.svelte';
     import Exporter from '$lib/Exporter.svelte';
@@ -9,9 +10,7 @@
     import type { TickerConfiguration, WatchListConfiguration } from "$lib/ticker-configurations";
     import WatchListConfigurationForm from "$lib/watch-list-configuration-form.svelte";
     import CreateOrPickWatchList from "$lib/create-or-pick-watch-list.svelte";
-    import { getContext } from "svelte";
 
-    let state: 'chart' | 'export' | 'ticker_overview' = 'chart'
     let chartsOpen = true
     let overviewOpen = false
     let exportsOpen = false
@@ -153,6 +152,9 @@
                 <input type="checkbox" name="overview" bind:checked={overviewOpen}>
             </div>
         </div>
+    </div>
+    <div >
+        <img style="width: 100%; max-height: 300px;" src={logo} alt="logo"/>
     </div>
     <div>
         <WatchListConfigurationForm

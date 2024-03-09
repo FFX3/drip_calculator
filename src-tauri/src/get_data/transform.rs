@@ -37,7 +37,7 @@ impl AssetSeries {
 pub struct DripData {
     drip: Option<f32>,
     pub dividend: Option<f32>,
-    share_count: f32,
+    pub share_count: f32,
     pub position_value: f32,
     pub total_return: f32,
 }
@@ -45,11 +45,11 @@ pub struct DripData {
 #[derive(Debug, Clone, Copy)]
 pub struct PositionSeriesEntry {
     pub date: chrono::DateTime<chrono::offset::Utc>,
-    close: f32,
-    nav: f32,
+    pub close: f32,
+    pub nav: f32,
     pub dividend: Option<f32>,
     pub position_value: f32,
-    total_dividends: f32,
+    pub total_dividends: f32,
     pub total_return: f32,
     pub drip: DripData,
     pub drip_at_nav: Option<DripData>
