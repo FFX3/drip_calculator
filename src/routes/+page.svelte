@@ -66,7 +66,7 @@
                     })
                     mtrDAN.push({
                         month: entry.month,
-                        total_return: entry.drip_at_nav
+                        total_return: entry.drip_at_nav ?? entry.drip
                     })
                 })
 
