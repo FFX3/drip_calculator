@@ -112,6 +112,15 @@
         }}>5 Y</button>
     </div>
     <div style="display: flex; gap: 20px; padding-bottom: 20px;">
+        <div>
+            <label for="all_tickers">All</label>
+            <input checked on:change={(e)=>{
+                Object.keys(tickersToBeFetched).map((ticker)=>{
+                    tickersToBeFetched[ticker] = e.target.checked
+                })
+                console.log(tickersToBeFetched)
+            }} type="checkbox" name="all_tickers">
+        </div>
         {#each tickerConfigurations as config}
             <div>
                 <label for={config.ticker}>{config.ticker.toUpperCase()}</label>

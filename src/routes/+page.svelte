@@ -133,6 +133,14 @@
         />
         <div style="display: flex; flex-direction: row; gap: 20px;">
             <div>
+                <label for="chart">All:</label>
+                <input checked type="checkbox" name="chart" on:change={(e)=>{
+                    chartsOpen = e.target.checked
+                    exportsOpen = e.target.checked
+                    overviewOpen = e.target.checked
+                }}>
+            </div>
+            <div>
                 <label for="chart">Chart:</label>
                 <input type="checkbox" name="chart" bind:checked={chartsOpen}>
             </div>
