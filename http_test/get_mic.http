@@ -1,0 +1,2 @@
+GET https://www.morningstar.com/api/v1/search/entities?q=qqq&limit=1&autocomplete=false
+x-api-key: Nrc2ElgzRkaTE43D5vA7mrWj2WpSBR35fvmaqfte

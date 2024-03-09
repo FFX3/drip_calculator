@@ -32,43 +32,50 @@
         dripDatasets = []
         dripAtNavDatasets = []
         onlyWithDividends = {}
+        
+        try {
 
-        const promises = configs.map((config)=>{
-            return buildDataset(config.ticker, config.mic, start, end, initialInvestment, config.color, config.dripAtNav)
-        })
-        const results = await Promise.all(promises)
-        //@ts-ignore
-        const { drip, dripAtNav, noDrip, csvs: _csvs, onlyWithDividends: _onlyWithDividends } = results.reduce((carry, { drip, dripAtNav, noDrip, csv, ticker, onlyWithDividends })=>{
-
-            console.log(ticker, csv)
-            carry.drip.push(drip)
-            carry.noDrip.push(noDrip)
-            carry.csvs.push({
-                ticker,
-                csv
+            const promises = configs.map((config)=>{
+                return buildDataset(config.ticker, config.mic, start, end, initialInvestment, config.color, config.dripAtNav)
             })
-            carry.onlyWithDividends.push({
-                ticker,
-                data: onlyWithDividends
+            const results = await Promise.all(promises)
+            //@ts-ignore
+            const { drip, dripAtNav, noDrip, csvs: _csvs, onlyWithDividends: _onlyWithDividends } = results.reduce((carry, { drip, dripAtNav, noDrip, csv, ticker, onlyWithDividends })=>{
+
+                console.log(ticker, csv)
+                carry.drip.push(drip)
+                carry.noDrip.push(noDrip)
+                carry.csvs.push({
+                    ticker,
+                    csv
+                })
+                carry.onlyWithDividends.push({
+                    ticker,
+                    data: onlyWithDividends
+                })
+
+                carry.dripAtNav.push(dripAtNav ?? drip)
+
+                return carry
+            },{
+                drip: [],
+                dripAtNav: [],
+                noDrip: [],
+                csvs: [],
+                onlyWithDividends: [],
             })
 
-            carry.dripAtNav.push(dripAtNav ?? drip)
-
-            return carry
-        },{
-            drip: [],
-            dripAtNav: [],
-            noDrip: [],
-            csvs: [],
-            onlyWithDividends: [],
-        })
-
-        loading = false
-        dripDatasets = drip
-        dripAtNavDatasets = dripAtNav
-        noDripDatasets = noDrip
-        csvs = _csvs
-        onlyWithDividends = _onlyWithDividends
+            dripDatasets = drip
+            dripAtNavDatasets = dripAtNav
+            noDripDatasets = noDrip
+            csvs = _csvs
+            onlyWithDividends = _onlyWithDividends
+        } catch(e) {
+            console.error("DATA FETCH FAILED", e)
+            alert("DATA FETCH FAILED")
+        } finally {
+            loading = false
+        }
     }
 </script>
 
@@ -79,7 +86,6 @@
             bind:watchList={watchList}
         />
         <FetchDataForm 
-            bind:watchListName={watchListName}
             bind:watchList={watchList}
             loading={loading}
             fetchData={fetchData}

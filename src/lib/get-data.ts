@@ -18,9 +18,14 @@ export async function buildDataset(ticker: string, mic: string, start: Date, end
         dripAtNav,
     })
     const { 
+        error,
         //no_drip, drip, drip_at_nav,
         no_drip_total_return, drip_total_return, drip_at_nav_total_return, csv, only_with_dividends
     } = data
+
+    if(error) {
+        throw error
+    }
 
     const label = ticker.toUpperCase()
 
