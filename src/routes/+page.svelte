@@ -90,19 +90,19 @@
             loading={loading}
             fetchData={fetchData}
         />
-    </div>
-    <div style="display: flex; flex-direction: row; gap: 20px;">
-        <div>
-            <label for="chart">Chart:</label>
-            <input type="checkbox" name="chart" bind:checked={chartsOpen}>
-        </div>
-        <div>
-            <label for="export">Export:</label>
-            <input type="checkbox" name="export" bind:checked={exportsOpen}>
-        </div>
-        <div>
-            <label for="overview">Overview:</label>
-            <input type="checkbox" name="overview" bind:checked={overviewOpen}>
+        <div style="display: flex; flex-direction: row; gap: 20px;">
+            <div>
+                <label for="chart">Chart:</label>
+                <input type="checkbox" name="chart" bind:checked={chartsOpen}>
+            </div>
+            <div>
+                <label for="export">Export:</label>
+                <input type="checkbox" name="export" bind:checked={exportsOpen}>
+            </div>
+            <div>
+                <label for="overview">Overview:</label>
+                <input type="checkbox" name="overview" bind:checked={overviewOpen}>
+            </div>
         </div>
     </div>
     <div>

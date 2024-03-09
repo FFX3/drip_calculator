@@ -52,8 +52,6 @@
         border: 1px white solid;
         padding: 8px;
         height: 60px;
-    }
-    .config-form__input-container > input{
         width: 70px;
     }
 </style>
@@ -61,14 +59,18 @@
 <form class="config-form" on:submit={addTickerConfiguration}>
     <div>
         <div class="config-form__input-container">
-            <label for="ticker">Ticker</label>
-            <input required bind:value={ticker} name="ticker"/>
+            {#if !ticker }
+                <label for="ticker">Ticker</label>
+                <input required bind:value={ticker} name="ticker"/>
+            {:else}
+                <h3>{ticker.toUpperCase()}</h3>
+            {/if}
         </div>
-        <div class="config-form__input-container">
+        <!--<div class="config-form__input-container">
             <label for="mic">MIC code</label>
             <input required bind:value={mic} name="mic" />
-        </div>
-        <div class="config-form__input-container">
+        </div>-->
+        <div class="config-form__input-container" style="align-items: center;">
             <label for="drip_at_nav">DAV</label>
             <input bind:checked={dripAtNav} name="drip_at_nav"  type="checkbox"/>
         </div>

@@ -21,7 +21,6 @@
 </script>
 
 <div style="width: max-content; background-color: #535C91; display: flex; flex-direction: row; gap: 10px;">
-    <div style="width: 70px;"></div>
     <TickerConfigForm 
         clearOnSubmit={true}
         submitButtonText='Add'
@@ -30,7 +29,6 @@
 </div>
 {#each configuredTickersArray as config }
     <div style="width: max-content; background-color: #535C91; display: flex; flex-direction: row; gap: 10px;">
-        <h3 style="width: 70px;">{config.ticker.toUpperCase()}</h3>
         <TickerConfigForm 
             {...config}
             addTicker={_configureTicker}
