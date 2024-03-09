@@ -36,6 +36,7 @@ export async function buildDataset(ticker: string, mic: string, start: Date, end
             data: no_drip_total_return,
             borderColor: color,
             backgroundColor: color,
+            pointStyle: false,
         },
         drip: {
             label: label,
@@ -43,6 +44,7 @@ export async function buildDataset(ticker: string, mic: string, start: Date, end
             data: drip_total_return,
             borderColor: color,
             backgroundColor: color,
+            pointStyle: false,
         },
         dripAtNav: dripAtNav ? {
             label: label,
@@ -50,6 +52,7 @@ export async function buildDataset(ticker: string, mic: string, start: Date, end
             data: drip_at_nav_total_return,
             borderColor: color,
             backgroundColor: color,
+            pointStyle: false,
         } : null,
         csv,
         ticker,
