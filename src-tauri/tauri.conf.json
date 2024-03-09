@@ -12,12 +12,15 @@
   },
   "tauri": {
     "allowlist": {
+      "path": {
+        "all": true
+      },
       "fs": {
         "writeFile": true,
         "readFile": true,
         "readDir": true,
         "removeFile": true,
-        "scope": ["$APPCONFIG/ticker-confd/*", "$APPCONFIG/ticker-confd"]
+        "scope": [ "$APPCONFIG", "$APPCONFIG/*", "$APPCONFIG/ticker-confd/*", "$APPCONFIG/ticker-confd"]
       },
       "http": {
         "all": true,
