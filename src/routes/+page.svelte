@@ -9,6 +9,7 @@
     import type { TickerConfiguration, WatchListConfiguration } from "$lib/ticker-configurations";
     import WatchListConfigurationForm from "$lib/watch-list-configuration-form.svelte";
     import CreateOrPickWatchList from "$lib/create-or-pick-watch-list.svelte";
+    import { getContext } from "svelte";
 
     let state: 'chart' | 'export' | 'ticker_overview' = 'chart'
     let chartsOpen = true
@@ -19,6 +20,10 @@
     let noDripDatasets: any[] = []
     let dripDatasets: any[] = []
     let dripAtNavDatasets: any[] = []
+
+    let monthlyTotalReturnsNoDrip: { ticker: string, data: { total_return: number, month: number } }[] = []
+    let monthlyTotalReturnsDrip: { ticker: string, data: { total_return: number, month: number } }[] = []
+    let monthlyTotalReturnsDripAtNav: { ticker: string, data: { total_return: number, month: number } }[] = []
     let csvs: any[] = []
     let onlyWithDividends: any
     let loading = false
@@ -32,6 +37,9 @@
         dripDatasets = []
         dripAtNavDatasets = []
         onlyWithDividends = {}
+        monthlyTotalReturnsNoDrip = []
+        monthlyTotalReturnsDrip = []
+        monthlyTotalReturnsDripAtNav = []
         
         try {
 
@@ -40,8 +48,41 @@
             })
             const results = await Promise.all(promises)
             //@ts-ignore
-            const { drip, dripAtNav, noDrip, csvs: _csvs, onlyWithDividends: _onlyWithDividends } = results.reduce((carry, { drip, dripAtNav, noDrip, csv, ticker, onlyWithDividends })=>{
+            const { drip, dripAtNav, noDrip, csvs: _csvs, onlyWithDividends: _onlyWithDividends, monthly_total_return } = results.reduce((carry, { drip, dripAtNav, noDrip, csv, ticker, onlyWithDividends, monthly_total_return })=>{
 
+                const mtrND = [] 
+                const mtrD = [] 
+                const mtrDAN = [] 
+
+
+                monthly_total_return.forEach((entry)=>{
+                    mtrND.push({
+                        month: entry.month,
+                        total_return: entry.no_drip
+                    })
+                    mtrD.push({
+                        month: entry.month,
+                        total_return: entry.drip
+                    })
+                    mtrDAN.push({
+                        month: entry.month,
+                        total_return: entry.drip_at_nav
+                    })
+                })
+
+                monthlyTotalReturnsNoDrip.push({
+                    ticker,
+                    data: mtrND
+                })
+                monthlyTotalReturnsDrip.push({
+                    ticker,
+                    data: mtrD
+                })
+                monthlyTotalReturnsDripAtNav.push({
+                    ticker,
+                    data: mtrDAN
+                })
+                
                 console.log(ticker, csv)
                 carry.drip.push(drip)
                 carry.noDrip.push(noDrip)
@@ -132,6 +173,7 @@
                         title='Total Returns with no DRIP'
                         chartId='no_drip'
                         datasets={noDripDatasets}
+                        bind:monthlyTotalReturns={monthlyTotalReturnsNoDrip}
                     />
                 {/if}
                 {#if 'drip' == chartState}
@@ -139,6 +181,7 @@
                         title='Total Returns with DRIP at market price'
                         chartId='drip'
                         bind:datasets={dripDatasets}
+                        bind:monthlyTotalReturns={monthlyTotalReturnsDrip}
                     />
                 {/if}
                 {#if 'drip_at_nav' == chartState}
@@ -146,6 +189,7 @@
                         title='Total Returns with DRIP at NAV price'
                         chartId='drip_at_nav'
                         datasets={dripAtNavDatasets}
+                        bind:monthlyTotalReturns={monthlyTotalReturnsDripAtNav}
                     />
                 {/if}
             </div>

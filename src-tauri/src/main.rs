@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::fs;
+use std::{fs, result};
 
 #[macro_use]
 mod macros;
@@ -165,6 +165,33 @@ impl PositionSeries {
     pub fn only_with_dividend(&self) -> Vec<PositionSeriesEntry> {
         self.only_with_dividend_iter().cloned().collect::<Vec<PositionSeriesEntry>>()
     }
+
+
+    pub fn to_monthly_total_return(&self) -> Vec<MonthlyTotalReturn> {
+        let mut result: Vec<PositionSeriesEntry> = vec![];
+
+        let mut next_date = self.data.first().unwrap().date.clone();
+
+        for entry in self.data.iter() {
+            println!("{}-{}", next_date.year(), next_date.month());
+            if entry.date >= next_date {
+                result.push(entry.clone());
+                next_date = next_date.checked_add_months(chrono::Months::new(1)).unwrap();
+            }
+        }
+
+        result.iter().map(|entry: &PositionSeriesEntry|-> MonthlyTotalReturn {
+            MonthlyTotalReturn {
+                month: entry.date.month() as u8,
+                no_drip: entry.total_return,
+                drip: entry.drip.total_return,
+                drip_at_nav: match entry.drip_at_nav { 
+                    Some(data)=>Some(data.total_return), 
+                    None=>None 
+                },
+            }
+        }).collect()
+    }
 }
 
 #[derive(Serialize)]
@@ -213,6 +240,14 @@ impl OnlyWithDividendEntry {
 }
 
 #[derive(Serialize)]
+struct MonthlyTotalReturn {
+    month: u8,
+    no_drip: f32,
+    drip: f32,
+    drip_at_nav: Option<f32>,
+}
+
+#[derive(Serialize)]
 struct FetchDataResponse {
     no_drip: Vec<ChartPoint>,
     drip: Vec<ChartPoint>,
@@ -222,6 +257,7 @@ struct FetchDataResponse {
     drip_at_nav_total_return: Option<Vec<ChartPoint>>,
     csv: String,
     only_with_dividends: Vec<OnlyWithDividendEntry>,
+    monthly_total_return: Vec<MonthlyTotalReturn>,
 }
 
 #[tauri::command]
@@ -247,6 +283,7 @@ async fn fetch_data(ticker: String, mic: String, start_date: String, end_date: S
         drip_total_return: series.to_drip_total_return_chart_points(),
         drip_at_nav_total_return: series.to_drip_at_nav_total_return_chart_points(),
         csv: series.to_csv(),
+        monthly_total_return: series.to_monthly_total_return(),
         only_with_dividends: series.only_with_dividend_iter().map(|entry| -> OnlyWithDividendEntry { 
             OnlyWithDividendEntry::from_position_series_entry(entry)
         }).collect(),

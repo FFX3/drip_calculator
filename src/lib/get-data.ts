@@ -18,14 +18,13 @@ export async function buildDataset(ticker: string, mic: string, start: Date, end
         dripAtNav,
     })
     const { 
-        error,
-        //no_drip, drip, drip_at_nav,
-        no_drip_total_return, drip_total_return, drip_at_nav_total_return, csv, only_with_dividends
+        no_drip_total_return, 
+        drip_total_return, 
+        drip_at_nav_total_return, 
+        csv, 
+        only_with_dividends,
+        monthly_total_return
     } = data
-
-    if(error) {
-        throw error
-    }
 
     const label = ticker.toUpperCase()
 
@@ -54,6 +53,7 @@ export async function buildDataset(ticker: string, mic: string, start: Date, end
             backgroundColor: color,
             pointStyle: false,
         } : null,
+        monthly_total_return,
         csv,
         ticker,
         onlyWithDividends: only_with_dividends,
