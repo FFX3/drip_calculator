@@ -11,6 +11,9 @@
     import CreateOrPickWatchList from "$lib/create-or-pick-watch-list.svelte";
 
     let state: 'chart' | 'export' | 'ticker_overview' = 'chart'
+    let chartsOpen = true
+    let overviewOpen = false
+    let exportsOpen = false
     let chartState: 'no_drip' | 'drip' | 'drip_at_nav' = 'no_drip'
 
     let noDripDatasets: any[] = []
@@ -82,6 +85,20 @@
             fetchData={fetchData}
         />
     </div>
+    <div style="display: flex; flex-direction: row; gap: 20px;">
+        <div>
+            <label for="chart">Chart:</label>
+            <input type="checkbox" name="chart" bind:checked={chartsOpen}>
+        </div>
+        <div>
+            <label for="export">Export:</label>
+            <input type="checkbox" name="export" bind:checked={exportsOpen}>
+        </div>
+        <div>
+            <label for="overview">Overview:</label>
+            <input type="checkbox" name="overview" bind:checked={overviewOpen}>
+        </div>
+    </div>
     <div>
         <WatchListConfigurationForm
             watchListName={watchListName} 
@@ -90,27 +107,13 @@
     </div>
 </div>
 
-<div style="display: flex; flex-direction: row; gap: 20px; margin-top: 40px;" class="container">
-    <div>
-        <label for="chart">Chart:</label>
-        <input type="radio" name="chart" value="chart" bind:group={state}>
-    </div>
-    <div>
-        <label for="export">Export:</label>
-        <input type="radio" name="export" value="export" bind:group={state}>
-    </div>
-    <div>
-        <label for="ticker_overview">Ticker Overview:</label>
-        <input type="radio" name="ticker_overview" value="ticker_overview" bind:group={state}>
-    </div>
-</div>
 
 {#if loading }
     <div class="container" style="display: flex; justify-content: center; align-items: center;">
         <img src={loadingIndicatorGif} />
     </div>
 {:else}
-    {#if state == 'chart'}
+    {#if chartsOpen}
         <div class="container">
             <div style="display: flex; flex-direction: row;">
                 <div style={`padding: 10px; border: 1px white solid; ${chartState == 'no_drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'no_drip'}>no DRIP</div>
@@ -143,13 +146,13 @@
         </div>
     {/if}
 
-    {#if state == 'export'}
-        <Exporter csvs={csvs} />
-    {/if}
-
-    {#if state == 'ticker_overview'}
+    {#if overviewOpen}
         <Overview 
             data={onlyWithDividends} 
         />
+    {/if}
+
+    {#if exportsOpen}
+        <Exporter csvs={csvs} />
     {/if}
 {/if}
