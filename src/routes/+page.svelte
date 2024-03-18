@@ -119,100 +119,107 @@
     }
 </script>
 
-<div class="container" style="display: flex; justify-content: space-between; flex-direction: row; align-items: start;">
-    <div style="display: flex; gap: 10px; flex-direction: column;">
-        <CreateOrPickWatchList
-            bind:watchListName={watchListName}
-            bind:watchList={watchList}
-        />
-        <FetchDataForm 
-            bind:watchList={watchList}
-            loading={loading}
-            fetchData={fetchData}
-        />
-        <div style="display: flex; flex-direction: row; gap: 20px;">
-            <div>
-                <label for="chart">All:</label>
-                <input checked type="checkbox" name="chart" on:change={(e)=>{
-                    chartsOpen = e.target.checked
-                    exportsOpen = e.target.checked
-                    overviewOpen = e.target.checked
-                }}>
-            </div>
-            <div>
-                <label for="chart">Chart:</label>
-                <input type="checkbox" name="chart" bind:checked={chartsOpen}>
-            </div>
-            <div>
-                <label for="export">Export:</label>
-                <input type="checkbox" name="export" bind:checked={exportsOpen}>
-            </div>
-            <div>
-                <label for="overview">Overview:</label>
-                <input type="checkbox" name="overview" bind:checked={overviewOpen}>
+<div style="height: 100vh; padding: 10px;">
+
+    <div class="container" style="display: flex; justify-content: space-between; flex-direction: column; align-items: start;">
+        <div >
+            <img style="width: 150px; max-height: 300px;" src={logo} alt="logo"/>
+        </div>
+        <div style="display: flex; gap: 10px; flex-direction: column;">
+            <FetchDataForm 
+                bind:watchList={watchList}
+                loading={loading}
+                fetchData={fetchData}
+            />
+            <div style="display: flex; flex-direction: row; gap: 20px;">
+                <div>
+                    <label for="chart">All:</label>
+                    <input checked type="checkbox" name="chart" on:change={(e)=>{
+                        chartsOpen = e.target.checked
+                        exportsOpen = e.target.checked
+                        overviewOpen = e.target.checked
+                    }}>
+                </div>
+                <div>
+                    <label for="chart">Chart:</label>
+                    <input type="checkbox" name="chart" bind:checked={chartsOpen}>
+                </div>
+                <div>
+                    <label for="export">Export:</label>
+                    <input type="checkbox" name="export" bind:checked={exportsOpen}>
+                </div>
+                <div>
+                    <label for="overview">Overview:</label>
+                    <input type="checkbox" name="overview" bind:checked={overviewOpen}>
+                </div>
             </div>
         </div>
     </div>
-    <div >
-        <img style="width: 100%; max-height: 300px;" src={logo} alt="logo"/>
-    </div>
-    <div>
-        <WatchListConfigurationForm
-            watchListName={watchListName} 
-            bind:watchList={watchList} 
-        />
-    </div>
+
+
+    {#if loading }
+        <div class="container" style="display: flex; justify-content: center; align-items: center;">
+            <img src={loadingIndicatorGif} />
+        </div>
+    {:else}
+        <div style="width: 100%; display: flex; flex-direction: row; ">
+            <div class="container" style="gap: 10px; display: flex; flex-direction: column;">
+                <CreateOrPickWatchList
+                    bind:watchListName={watchListName}
+                    bind:watchList={watchList}
+                />
+                {#if watchListName}
+                    <WatchListConfigurationForm
+                        watchListName={watchListName} 
+                        bind:watchList={watchList} 
+                    />
+                {/if}
+            </div>
+        {#if chartsOpen}
+            <div class="container" style="flex: 1; min-width: 0;">
+                <div style="display: flex; flex-direction: row; ">
+                    <div style={`padding: 10px; border: 1px white solid; ${chartState == 'no_drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'no_drip'}>no DRIP</div>
+                    <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip'}>DRIP</div>
+                    <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip_at_nav' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip_at_nav'}>DRIP at NAV</div>
+                </div>
+                <div style="width: 100%;">
+                    {#if 'no_drip' == chartState}
+                        <Chart 
+                            title='Total Returns with no DRIP'
+                            chartId='no_drip'
+                            datasets={noDripDatasets}
+                            bind:monthlyTotalReturns={monthlyTotalReturnsNoDrip}
+                        />
+                    {/if}
+                    {#if 'drip' == chartState}
+                        <Chart 
+                            title='Total Returns with DRIP at market price'
+                            chartId='drip'
+                            bind:datasets={dripDatasets}
+                            bind:monthlyTotalReturns={monthlyTotalReturnsDrip}
+                        />
+                    {/if}
+                    {#if 'drip_at_nav' == chartState}
+                        <Chart 
+                            title='Total Returns with DRIP at NAV price'
+                            chartId='drip_at_nav'
+                            datasets={dripAtNavDatasets}
+                            bind:monthlyTotalReturns={monthlyTotalReturnsDripAtNav}
+                        />
+                    {/if}
+                </div>
+            </div>
+        {/if}
+
+        {#if overviewOpen}
+            <Overview 
+                data={onlyWithDividends} 
+            />
+        {/if}
+
+        {#if exportsOpen}
+            <Exporter csvs={csvs} />
+        {/if}
+        </div>
+    {/if}
 </div>
-
-
-{#if loading }
-    <div class="container" style="display: flex; justify-content: center; align-items: center;">
-        <img src={loadingIndicatorGif} />
-    </div>
-{:else}
-    {#if chartsOpen}
-        <div class="container">
-            <div style="display: flex; flex-direction: row;">
-                <div style={`padding: 10px; border: 1px white solid; ${chartState == 'no_drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'no_drip'}>no DRIP</div>
-                <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip'}>DRIP</div>
-                <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip_at_nav' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip_at_nav'}>DRIP at NAV</div>
-            </div>
-            <div style="width: 100%;">
-                {#if 'no_drip' == chartState}
-                    <Chart 
-                        title='Total Returns with no DRIP'
-                        chartId='no_drip'
-                        datasets={noDripDatasets}
-                        bind:monthlyTotalReturns={monthlyTotalReturnsNoDrip}
-                    />
-                {/if}
-                {#if 'drip' == chartState}
-                    <Chart 
-                        title='Total Returns with DRIP at market price'
-                        chartId='drip'
-                        bind:datasets={dripDatasets}
-                        bind:monthlyTotalReturns={monthlyTotalReturnsDrip}
-                    />
-                {/if}
-                {#if 'drip_at_nav' == chartState}
-                    <Chart 
-                        title='Total Returns with DRIP at NAV price'
-                        chartId='drip_at_nav'
-                        datasets={dripAtNavDatasets}
-                        bind:monthlyTotalReturns={monthlyTotalReturnsDripAtNav}
-                    />
-                {/if}
-            </div>
-        </div>
-    {/if}
-
-    {#if overviewOpen}
-        <Overview 
-            data={onlyWithDividends} 
-        />
-    {/if}
-
-    {#if exportsOpen}
-        <Exporter csvs={csvs} />
-    {/if}
-{/if}
