@@ -51,7 +51,7 @@
     <canvas id={chartId}></canvas>
 </div>
 
-<div style="width: 100%; display: flex; flex-direction: row; text-align: center;">
+<div style="width: 100%; display: flex; flex-direction: row; text-align: center; overflow-x: scroll;">
     <div>
         <div>Ticker</div>
         {#each monthlyTotalReturns as ticker}

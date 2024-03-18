@@ -89,57 +89,59 @@
 </style>
 
 <div class="container">
-    <label for="lastXMonths">Last X Months (for income estimate)</label>
-    <br>
-    <input name="lastXMonths" bind:value={lastXMonths}>
+    <div class="container">
+        <label for="lastXMonths">Last X Months (for income estimate)</label>
+        <br>
+        <input name="lastXMonths" bind:value={lastXMonths}>
 
-    <div style="display: flex; flex-direction: row; gap: 20px;">
-        <div>
-            <label for="no_drip">No drip:</label>
-            <input type="radio" name="no_drip" value="no_drip" bind:group={state}>
-        </div>
-        <div>
-            <label for="drip">Drip:</label>
-            <input type="radio" name="drip" value="drip" bind:group={state}>
-        </div>
-        <div>
-            <label for="drip_at_nav">Drip at nav:</label>
-            <input type="radio" name="drip_at_nav" value="drip_at_nav" bind:group={state}>
+        <div style="display: flex; flex-direction: row; gap: 20px;">
+            <div>
+                <label for="no_drip">No drip:</label>
+                <input type="radio" name="no_drip" value="no_drip" bind:group={state}>
+            </div>
+            <div>
+                <label for="drip">Drip:</label>
+                <input type="radio" name="drip" value="drip" bind:group={state}>
+            </div>
+            <div>
+                <label for="drip_at_nav">Drip at nav:</label>
+                <input type="radio" name="drip_at_nav" value="drip_at_nav" bind:group={state}>
+            </div>
         </div>
     </div>
-</div>
 
-<div style="display: flex; gap: 50px;">
-{#if _data}
-    {#each _data as ticker, i }
-        <div class="container">
-            <h2>{ticker.ticker.toUpperCase()}</h2>
+    <div style="display: flex; gap: 50px; overflow: scroll; max-height: 800px;">
+    {#if _data}
+        {#each _data as ticker, i }
+            <div class="container">
+                <h2>{ticker.ticker.toUpperCase()}</h2>
 
-            <p>Yearly estimated income: ${estimatedYearlyIncome[i]}</p>
+                <p>Yearly estimated income: ${estimatedYearlyIncome[i]}</p>
 
-            <p>Yearly geometric average return: {geometrictReturns[i]}%</p>
+                <p>Yearly geometric average return: {geometrictReturns[i]}%</p>
 
-            <table style="border-spacing: 10px; width: 400px;">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Dividend</th>
-                        <th>Position Value</th>
-                        <th>Total Return</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each ticker.data.toReversed() as entry }
+                <table style="border-spacing: 10px; width: 400px;">
+                    <thead>
                         <tr>
-                            <td>{entry.date}</td>
-                            <td>{entry.dividend.toFixed(2)}</td>
-                            <td>{entry.position_value.toFixed(2)}</td>
-                            <td>{(entry.total_return * 100).toFixed(2)}%</td>
+                            <th>Date</th>
+                            <th>Dividend</th>
+                            <th>Position Value</th>
+                            <th>Total Return</th>
                         </tr>
-                    {/each}
-                </tbody>
-            </table>
-        </div>
-    {/each}
-{/if}
+                    </thead>
+                    <tbody>
+                        {#each ticker.data.toReversed() as entry }
+                            <tr>
+                                <td>{entry.date}</td>
+                                <td>{entry.dividend.toFixed(2)}</td>
+                                <td>{entry.position_value.toFixed(2)}</td>
+                                <td>{(entry.total_return * 100).toFixed(2)}%</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
+        {/each}
+    {/if}
+    </div>
 </div>

@@ -4,6 +4,7 @@
     export let addTicker: (conf: TickerConfiguaration)=>void
 
     export let ticker: string = ""
+    let tickerInput: string = ""
     export let mic: string = ""
     export let dripAtNav: boolean = false
     export let color: string = ""
@@ -14,13 +15,13 @@
     function addTickerConfiguration(event: SubmitEvent){
         event.preventDefault()
         addTicker({
-            ticker,
+            ticker: tickerInput ?? ticker,
             mic,
             dripAtNav,
             color
         })
         if(clearOnSubmit){
-            ticker = ''
+            tickerInput = ''
             mic = ''
             color = ''
             dripAtNav = false
@@ -61,7 +62,7 @@
         <div class="config-form__input-container">
             {#if !ticker }
                 <label for="ticker">Ticker</label>
-                <input required bind:value={ticker} name="ticker"/>
+                <input required bind:value={tickerInput} name="ticker"/>
             {:else}
                 <h3>{ticker.toUpperCase()}</h3>
             {/if}

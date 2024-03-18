@@ -28,35 +28,37 @@
 
 </script>
 
-<div class="container" style="display: flex; gap: 20px;">
-    
+<div class="container">
     <div>
         <label>default export path</label>
         <input bind:value={defaultExportPath} />
     </div>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        
 
-    {#each csvs as csv}
-        <div class="container">
-            <h3>{csv.ticker.toUpperCase()}</h3>
-            <button on:click={async ()=>{
-                await writeText(csv.csv)
-                alert(csv.ticker + " csv copied to clipboard")
-            }}>copy</button>
-            <button on:click={async ()=>{
-                settingsManager.setCache("defaultExportPath", defaultExportPath)
-                await settingsManager.syncCache()
-                const filePath = await save({
-                    defaultPath: `${defaultExportPath}\\${csv.ticker}-data.csv`,
-                    filters: [{
-                        name: 'csv',
-                        extensions: ['csv'],
-                    }]
-                });
-                if(filePath){
-                    await writeTextFile(filePath, csv.csv);
-                }
+        {#each csvs as csv}
+            <div class="container">
+                <h3>{csv.ticker.toUpperCase()}</h3>
+                <button on:click={async ()=>{
+                    await writeText(csv.csv)
+                    alert(csv.ticker + " csv copied to clipboard")
+                }}>copy</button>
+                <button on:click={async ()=>{
+                    settingsManager.setCache("defaultExportPath", defaultExportPath)
+                    await settingsManager.syncCache()
+                    const filePath = await save({
+                        defaultPath: `${defaultExportPath}\\${csv.ticker}-data.csv`,
+                        filters: [{
+                            name: 'csv',
+                            extensions: ['csv'],
+                        }]
+                    });
+                    if(filePath){
+                        await writeTextFile(filePath, csv.csv);
+                    }
 
-            }}>export</button>
-        </div>
-    {/each}
+                }}>export</button>
+            </div>
+        {/each}
+    </div>
 </div>

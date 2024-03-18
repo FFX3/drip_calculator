@@ -175,51 +175,54 @@
                     />
                 {/if}
             </div>
-        {#if chartsOpen}
-            <div class="container" style="flex: 1; min-width: 0;">
-                <div style="display: flex; flex-direction: row; ">
-                    <div style={`padding: 10px; border: 1px white solid; ${chartState == 'no_drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'no_drip'}>no DRIP</div>
-                    <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip'}>DRIP</div>
-                    <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip_at_nav' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip_at_nav'}>DRIP at NAV</div>
-                </div>
-                <div style="width: 100%;">
-                    {#if 'no_drip' == chartState}
-                        <Chart 
-                            title='Total Returns with no DRIP'
-                            chartId='no_drip'
-                            datasets={noDripDatasets}
-                            bind:monthlyTotalReturns={monthlyTotalReturnsNoDrip}
-                        />
-                    {/if}
-                    {#if 'drip' == chartState}
-                        <Chart 
-                            title='Total Returns with DRIP at market price'
-                            chartId='drip'
-                            bind:datasets={dripDatasets}
-                            bind:monthlyTotalReturns={monthlyTotalReturnsDrip}
-                        />
-                    {/if}
-                    {#if 'drip_at_nav' == chartState}
-                        <Chart 
-                            title='Total Returns with DRIP at NAV price'
-                            chartId='drip_at_nav'
-                            datasets={dripAtNavDatasets}
-                            bind:monthlyTotalReturns={monthlyTotalReturnsDripAtNav}
-                        />
-                    {/if}
-                </div>
+
+            <div style="flex: 1; min-width: 0; flex-direction: column;">
+                {#if chartsOpen}
+                    <div class="container" >
+                        <div style="display: flex; flex-direction: row; ">
+                            <div style={`padding: 10px; border: 1px white solid; ${chartState == 'no_drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'no_drip'}>no DRIP</div>
+                            <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip'}>DRIP</div>
+                            <div style={`padding: 10px; border: 1px white solid; ${chartState == 'drip_at_nav' ? 'background-color: white; color: black;' : ''}`} on:click={()=>chartState = 'drip_at_nav'}>DRIP at NAV</div>
+                        </div>
+                        <div style="width: 100%;">
+                            {#if 'no_drip' == chartState}
+                                <Chart 
+                                    title='Total Returns with no DRIP'
+                                    chartId='no_drip'
+                                    datasets={noDripDatasets}
+                                    bind:monthlyTotalReturns={monthlyTotalReturnsNoDrip}
+                                />
+                            {/if}
+                            {#if 'drip' == chartState}
+                                <Chart 
+                                    title='Total Returns with DRIP at market price'
+                                    chartId='drip'
+                                    bind:datasets={dripDatasets}
+                                    bind:monthlyTotalReturns={monthlyTotalReturnsDrip}
+                                />
+                            {/if}
+                            {#if 'drip_at_nav' == chartState}
+                                <Chart 
+                                    title='Total Returns with DRIP at NAV price'
+                                    chartId='drip_at_nav'
+                                    datasets={dripAtNavDatasets}
+                                    bind:monthlyTotalReturns={monthlyTotalReturnsDripAtNav}
+                                />
+                            {/if}
+                        </div>
+                    </div>
+                {/if}
+
+                {#if overviewOpen}
+                    <Overview 
+                        data={onlyWithDividends} 
+                    />
+                {/if}
+
+                {#if exportsOpen}
+                    <Exporter csvs={csvs} />
+                {/if}
             </div>
-        {/if}
-
-        {#if overviewOpen}
-            <Overview 
-                data={onlyWithDividends} 
-            />
-        {/if}
-
-        {#if exportsOpen}
-            <Exporter csvs={csvs} />
-        {/if}
         </div>
     {/if}
 </div>
